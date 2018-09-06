@@ -7,23 +7,30 @@ const PROJECT_ROOT = join(__dirname, '../../');
 const DIST_ROOT = join(PROJECT_ROOT, 'dist');
 const NODE_MODULES_BIN = join(PROJECT_ROOT, 'node_modules/.bin');
 const NGC = join(NODE_MODULES_BIN, 'ngc');
-const TSCONFIG  = join(PROJECT_ROOT, 'tsconfig.json');
+const TSCONFIG = join(PROJECT_ROOT, 'tsconfig.json');
 
 function ngc(target: string, module: string, outDir: string) {
   const tsConfigPath = createTsconfig.apply(null, arguments);
   return new Promise<any>((resolve, reject) => {
-    exec(`${NGC} -p ${tsConfigPath}`, (err: Error, stdout: string, stderr: string) => {
-      if (err || stderr) {
-        reject(err || stderr);
-      } else {
-        destroyTsconfig(tsConfigPath);
-        resolve();
+    exec(
+      `"${NGC}" -p "${tsConfigPath}"`,
+      (err: Error, stdout: string, stderr: string) => {
+        if (err || stderr) {
+          reject(err || stderr);
+        } else {
+          destroyTsconfig(tsConfigPath);
+          resolve();
+        }
       }
-    });
+    );
   });
 }
 
-function createTsconfig(target: string, module: string, outDir: string): string {
+function createTsconfig(
+  target: string,
+  module: string,
+  outDir: string
+): string {
   const tsConfig = readJsonSync(TSCONFIG);
   tsConfig.compilerOptions.target = target;
   tsConfig.compilerOptions.module = module;
